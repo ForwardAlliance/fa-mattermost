@@ -1,0 +1,32 @@
+{
+  "id": "tw.org.forward.channel.name.restrictions",
+  "name": "[Forward Alliance] Channel Name Restrictions",
+  "description": "Allows only admins to create channels whose display name or handle starts with configured prefixes.",
+  "min_server_version": "10.0.0",
+  "server": {
+    "executables": {
+      "linux-amd64": "server/dist/plugin-linux-amd64",
+      "linux-arm64": "server/dist/plugin-linux-arm64"
+    }
+  },
+  "settings_schema": {
+    "header": "Restrict sensitive channel name prefixes to admins only.",
+    "footer": "Mattermost only exposes a post-create hook for channels, so blocked channels are deleted immediately after creation.",
+    "settings": [
+      {
+        "key": "RestrictedPrefixes",
+        "display_name": "Restricted Prefixes",
+        "type": "text",
+        "help_text": "Comma, semicolon, or newline-separated prefixes matched against the display name and URL handle. Matching is case-insensitive.",
+        "default": "壯闊"
+      },
+      {
+        "key": "RejectionMessage",
+        "display_name": "Rejection Message",
+        "type": "text",
+        "help_text": "Message shown to non-admins when the plugin removes a channel created with a restricted prefix.",
+        "default": "Only admins can create channels whose name starts with a restricted prefix."
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "tw.org.forward.announcement.read.only",
+  "name": "[Forward Alliance] Announcement Channel Read Only",
+  "description": "Restricts configured announcement channels to admins while allowing other channels to behave normally.",
+  "min_server_version": "10.0.0",
+  "server": {
+    "executables": {
+      "linux-amd64": "server/dist/plugin-linux-amd64",
+      "linux-arm64": "server/dist/plugin-linux-arm64"
+    }
+  },
+  "settings_schema": {
+    "header": "Configure the channel slug that should stay read-only for non-admins.",
+    "footer": "Use the URL slug, not the display name. Example: announcements.",
+    "settings": [
+      {
+        "key": "ChannelName",
+        "display_name": "Restricted Channel Slugs",
+        "type": "text",
+        "help_text": "Comma-separated channel slugs (e.g., announcement,announcements).",
+        "default": "announcement,announcements"
+      },
+      {
+        "key": "RejectionMessage",
+        "display_name": "Rejection Message",
+        "type": "text",
+        "help_text": "Message shown when a non-admin tries to post or edit in a restricted channel.",
+        "default": "This is a read-only announcement channel. Only admins can post here."
+      }
+    ]
+  }
+}
