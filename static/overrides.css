@@ -114,6 +114,23 @@ html {
   display: none !important;
 }
 
+/*
+ * Signing out strands the user: the account service generates each Mattermost
+ * password, encrypts it and logs the user in transparently, so nobody knows
+ * their own credentials and the sign-in form is unusable. Recovery means going
+ * back through the account service.
+ */
+#logout {
+  display: none !important;
+}
+
 .app__body.announcement-bar--fixed {
   padding-top: 0 !important;
+}
+
+.about-modal__logo,
+.about-modal__content .form-group.less,
+.about-modal__notice,
+.about-modal__hash {
+  display: none !important;
 }

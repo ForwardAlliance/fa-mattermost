@@ -22,6 +22,7 @@ services:
       MM_SERVICESETTINGS_ENABLEEMAILINVITATIONS: 'false'
       MM_SERVICESETTINGS_ENABLEMULTIFACTORAUTHENTICATION: 'true'
       MM_SERVICESETTINGS_ENABLEDESKTOPLANDINGPAGE: 'false'
+      MM_SERVICESETTINGS_EXPERIMENTALPRIMARYTEAM: ${MM_PRIMARY_TEAM:-forward-alliance}
       MM_TEAMSETTINGS_SITENAME: 壯闊台灣通訊系統
       MM_TEAMSETTINGS_MAXUSERSPERTEAM: '10000'
       MM_TEAMSETTINGS_TEAMMATENAMEDISPLAY: nickname_full_name
@@ -30,7 +31,7 @@ services:
       MM_TEAMSETTINGS_CUSTOMDESCRIPTIONTEXT: 登入壯闊台灣通訊系統
       # Beyond the built-in town-square, which every team member joins automatically.
       MM_TEAMSETTINGS_EXPERIMENTALDEFAULTCHANNELS: announcements
-      MM_EMAILSETTINGS_SENDEMAILNOTIFICATIONS: ${MM_SEND_EMAIL_NOTIFICATIONS:-true}
+      MM_EMAILSETTINGS_SENDEMAILNOTIFICATIONS: ${MM_SEND_EMAIL_NOTIFICATIONS:-false}
       # Paired with MM_ENABLE_USER_CREATION for the same first-deploy bootstrap.
       MM_EMAILSETTINGS_ENABLESIGNUPWITHEMAIL: ${MM_ENABLE_SIGNUP_WITH_EMAIL:-false}
       MM_EMAILSETTINGS_FEEDBACKNAME: 壯闊台灣通訊系統
@@ -50,9 +51,18 @@ services:
       MM_SUPPORTSETTINGS_TERMSOFSERVICELINK: https://www.forward.org.tw/a/tos
       MM_SUPPORTSETTINGS_PRIVACYPOLICYLINK: https://www.forward.org.tw/a/privacy
       MM_SUPPORTSETTINGS_ABOUTLINK: https://www.forward.org.tw/about/us
-      MM_SUPPORTSETTINGS_HELPLINK: https://www.forward.org.tw/about/contact
-      MM_SUPPORTSETTINGS_REPORTAPROBLEMLINK: https://www.forward.org.tw/about/contact
-      MM_SUPPORTSETTINGS_REPORTAPROBLEMTYPE: link
+      # Empty on purpose: the webapp renders the Help menu item only when this
+      # carries a value, so blanking it removes the entry rather than hiding it
+      # after the fact. Support reaches us through the volunteer system, not
+      # through the chat client.
+      MM_SUPPORTSETTINGS_HELPLINK: ${MM_HELP_LINK:-}
+      # "Report a Problem" is removed by its own type rather than by an empty
+      # link: Config.IsValid rejects a blank ReportAProblemLink while the type
+      # is `link`, and the server exits before it serves anything. `hidden` is
+      # upstream's supported way to drop the entry ("Hide link" in the System
+      # Console). Set MM_REPORT_PROBLEM_TYPE=link alongside a link to restore it.
+      MM_SUPPORTSETTINGS_REPORTAPROBLEMLINK: ${MM_REPORT_PROBLEM_LINK:-}
+      MM_SUPPORTSETTINGS_REPORTAPROBLEMTYPE: ${MM_REPORT_PROBLEM_TYPE:-hidden}
       MM_SUPPORTSETTINGS_REPORTAPROBLEMMAIL: 'contact@forward.org.tw'
       MM_SUPPORTSETTINGS_ALLOWDOWNLOADLOGS: 'true'
       MM_SUPPORTSETTINGS_FORGOTPASSWORDLINK: ${MM_FORGOT_PASSWORD_LINK:-https://account.forward.org.tw/mattermost/password}
@@ -66,9 +76,12 @@ services:
       MM_THEMESETTINGS_DEFAULTTHEME: denim
       MM_PRIVACYSETTINGS_SHOWEMAILADDRESS: 'false'
       MM_PRIVACYSETTINGS_SHOWFULLNAME: 'true'
-      MM_NATIVEAPPSETTINGS_APPDOWNLOADLINK: ${MM_APP_DOWNLOAD_LINK:-https://app.icanhelp.tw}
-      MM_NATIVEAPPSETTINGS_ANDROIDAPPDOWNLOADLINK: ${MM_APP_DOWNLOAD_LINK:-https://app.icanhelp.tw}
-      MM_NATIVEAPPSETTINGS_IOSAPPDOWNLOADLINK: ${MM_APP_DOWNLOAD_LINK:-https://app.icanhelp.tw}
+      # Also empty on purpose, and for the same reason: chat is reached through
+      # the iCanHelp app and the web client, so pointing users at a separate
+      # Mattermost download only leads them somewhere they cannot sign in.
+      MM_NATIVEAPPSETTINGS_APPDOWNLOADLINK: ${MM_APP_DOWNLOAD_LINK:-}
+      MM_NATIVEAPPSETTINGS_ANDROIDAPPDOWNLOADLINK: ${MM_APP_DOWNLOAD_LINK:-}
+      MM_NATIVEAPPSETTINGS_IOSAPPDOWNLOADLINK: ${MM_APP_DOWNLOAD_LINK:-}
       MM_PLUGINSETTINGS_DIRECTORY: /mattermost/forward-plugins
       MM_PLUGINSETTINGS_ENABLEUPLOADS: 'true'
 

@@ -86,9 +86,12 @@ WORKDIR /build
 RUN apk add --no-cache jq
 
 COPY --from=mattermost-base /mattermost/i18n ./i18n
+COPY --from=mattermost-base /mattermost/client/i18n ./client-i18n
 COPY scripts/patch-i18n-email-subjects.sh ./scripts/patch-i18n-email-subjects.sh
+COPY scripts/patch-i18n-about-text.sh ./scripts/patch-i18n-about-text.sh
 
 RUN sh ./scripts/patch-i18n-email-subjects.sh ./i18n
+RUN sh ./scripts/patch-i18n-about-text.sh ./client-i18n
 
 FROM alpine:3.21 AS webapp-patcher
 WORKDIR /build
@@ -96,14 +99,17 @@ WORKDIR /build
 COPY --from=mattermost-base /mattermost/client/root.html ./client/root.html
 COPY scripts/patch-root-html.sh ./scripts/patch-root-html.sh
 COPY static/overrides.css ./client/overrides.css
+COPY static/overrides.js ./client/overrides.js
 
-RUN sh ./scripts/patch-root-html.sh ./client/root.html /static/overrides.css
+RUN sh ./scripts/patch-root-html.sh ./client/root.html /static/overrides.css /static/overrides.js
 
 FROM mattermost/mattermost-team-edition:${MATTERMOST_VERSION}
 COPY --chown=2000:2000 --from=server-builder /mattermost-server /mattermost/bin/mattermost
 COPY --chown=2000:2000 --from=installer /plugin-bundles/ /mattermost/forward-plugin-bundles/
 COPY --chown=2000:2000 --from=i18n-patcher /build/i18n/ /mattermost/i18n/
+COPY --chown=2000:2000 --from=i18n-patcher /build/client-i18n/ /mattermost/client/i18n/
 COPY --chown=2000:2000 --from=webapp-patcher /build/client/root.html /mattermost/client/root.html
 COPY --chown=2000:2000 --from=webapp-patcher /build/client/overrides.css /mattermost/client/overrides.css
+COPY --chown=2000:2000 --from=webapp-patcher /build/client/overrides.js /mattermost/client/overrides.js
 COPY --chown=2000:2000 --from=builder /build/plugin-bootstrap /mattermost/bin/plugin-bootstrap
 CMD ["/mattermost/bin/plugin-bootstrap"]
