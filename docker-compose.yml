@@ -51,13 +51,18 @@ services:
       MM_SUPPORTSETTINGS_TERMSOFSERVICELINK: https://www.forward.org.tw/a/tos
       MM_SUPPORTSETTINGS_PRIVACYPOLICYLINK: https://www.forward.org.tw/a/privacy
       MM_SUPPORTSETTINGS_ABOUTLINK: https://www.forward.org.tw/about/us
-      # Empty on purpose: the webapp renders the Help and "Report a Problem"
-      # menu items only when these carry a value, so blanking them removes the
-      # entries rather than hiding them after the fact. Support reaches us
-      # through the volunteer system, not through the chat client.
+      # Empty on purpose: the webapp renders the Help menu item only when this
+      # carries a value, so blanking it removes the entry rather than hiding it
+      # after the fact. Support reaches us through the volunteer system, not
+      # through the chat client.
       MM_SUPPORTSETTINGS_HELPLINK: ${MM_HELP_LINK:-}
+      # "Report a Problem" is removed by its own type rather than by an empty
+      # link: Config.IsValid rejects a blank ReportAProblemLink while the type
+      # is `link`, and the server exits before it serves anything. `hidden` is
+      # upstream's supported way to drop the entry ("Hide link" in the System
+      # Console). Set MM_REPORT_PROBLEM_TYPE=link alongside a link to restore it.
       MM_SUPPORTSETTINGS_REPORTAPROBLEMLINK: ${MM_REPORT_PROBLEM_LINK:-}
-      MM_SUPPORTSETTINGS_REPORTAPROBLEMTYPE: link
+      MM_SUPPORTSETTINGS_REPORTAPROBLEMTYPE: ${MM_REPORT_PROBLEM_TYPE:-hidden}
       MM_SUPPORTSETTINGS_REPORTAPROBLEMMAIL: 'contact@forward.org.tw'
       MM_SUPPORTSETTINGS_ALLOWDOWNLOADLOGS: 'true'
       MM_SUPPORTSETTINGS_FORGOTPASSWORDLINK: ${MM_FORGOT_PASSWORD_LINK:-https://account.forward.org.tw/mattermost/password}
