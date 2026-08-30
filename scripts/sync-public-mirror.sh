@@ -8,11 +8,14 @@
 #
 # Usage:
 #   scripts/sync-public-mirror.sh --repo https://github.com/ORG/REPO [--dry-run]
+#   scripts/sync-public-mirror.sh --repo git@github.com:ORG/REPO.git [--dry-run]
 #
-# --repo must not carry credentials. Set MIRROR_TOKEN (and optionally
-# MIRROR_USERNAME) instead: the token is handed to git through GIT_ASKPASS, so
-# it stays out of the URL, out of `ps`, out of push output, and out of anything
-# derived from the URL such as the NOTICE below.
+# --repo must not carry credentials. Either authenticate over SSH -- what the
+# deploy does, with a repo-scoped deploy key supplied through GIT_SSH_COMMAND
+# -- or set MIRROR_TOKEN (and optionally MIRROR_USERNAME), which is handed to
+# git through GIT_ASKPASS. Both keep the credential out of the URL, out of
+# `ps`, out of push output, and out of anything derived from the URL such as
+# the NOTICE below.
 #
 # Files come from `git archive`, so only committed, non-ignored files are ever
 # published: mattermost/.env is gitignored and cannot reach the mirror even if
