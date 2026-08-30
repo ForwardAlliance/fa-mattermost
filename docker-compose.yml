@@ -1,0 +1,87 @@
+name: mattermost-stack
+services:
+  mattermost:
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 200
+    read_only: false
+    tmpfs:
+      - /tmp
+    volumes:
+      - mattermost-config:/mattermost/config:rw
+      - mattermost-data:/mattermost/data:rw
+      - mattermost-logs:/mattermost/logs:rw
+      - mattermost-bleve-indexes:/mattermost/bleve-indexes:rw
+    environment:
+      TZ: Asia/Taipei
+      APP_PORT: 8065
+      MM_SQLSETTINGS_DRIVERNAME: postgres
+      MM_SERVICESETTINGS_ENABLEUSERSTATUSES: 'true'
+      MM_SERVICESETTINGS_ENABLEUSERACCESSTOKENS: 'true'
+      MM_SERVICESETTINGS_ENABLEEMAILINVITATIONS: 'false'
+      MM_SERVICESETTINGS_ENABLEMULTIFACTORAUTHENTICATION: 'true'
+      MM_SERVICESETTINGS_ENABLEDESKTOPLANDINGPAGE: 'false'
+      MM_SERVICESETTINGS_EXPERIMENTALPRIMARYTEAM: ${MM_PRIMARY_TEAM:-forward-alliance}
+      MM_TEAMSETTINGS_SITENAME: 壯闊台灣通訊系統
+      MM_TEAMSETTINGS_MAXUSERSPERTEAM: '10000'
+      MM_TEAMSETTINGS_TEAMMATENAMEDISPLAY: nickname_full_name
+      MM_TEAMSETTINGS_ENABLEUSERCREATION: ${MM_ENABLE_USER_CREATION:-false}
+      MM_TEAMSETTINGS_ENABLEOPENSERVER: 'false'
+      MM_TEAMSETTINGS_CUSTOMDESCRIPTIONTEXT: 登入壯闊台灣通訊系統
+      # Beyond the built-in town-square, which every team member joins automatically.
+      MM_TEAMSETTINGS_EXPERIMENTALDEFAULTCHANNELS: announcements
+      MM_EMAILSETTINGS_SENDEMAILNOTIFICATIONS: ${MM_SEND_EMAIL_NOTIFICATIONS:-false}
+      # Paired with MM_ENABLE_USER_CREATION for the same first-deploy bootstrap.
+      MM_EMAILSETTINGS_ENABLESIGNUPWITHEMAIL: ${MM_ENABLE_SIGNUP_WITH_EMAIL:-false}
+      MM_EMAILSETTINGS_FEEDBACKNAME: 壯闊台灣通訊系統
+      MM_EMAILSETTINGS_FEEDBACKEMAIL: chat@forward.org.tw
+      MM_EMAILSETTINGS_REPLYTOADDRESS: chat@forward.org.tw
+      MM_EMAILSETTINGS_FEEDBACKORGANIZATION: 社團法人壯闊台灣聯盟 Forward Alliance
+      MM_EMAILSETTINGS_ENABLESMTPAUTH: 'false'
+      MM_EMAILSETTINGS_SMTPUSERNAME: forwardalliance
+      MM_EMAILSETTINGS_SMTPPASSWORD: ${MM_EMAILSETTINGS_SMTPPASSWORD}
+      MM_EMAILSETTINGS_SMTPSERVER: smtp.mandrillapp.com
+      MM_EMAILSETTINGS_SMTPPORT: 587
+      MM_EMAILSETTINGS_SMTPSERVERTIMEOUT: '10'
+      MM_EMAILSETTINGS_CONNECTIONSECURITY: ''
+      MM_EMAILSETTINGS_SENDPUSHNOTIFICATIONS: ${MM_SEND_PUSH_NOTIFICATIONS:-true}
+      MM_EMAILSETTINGS_PUSHNOTIFICATIONSERVER: ${MM_PUSH_NOTIFICATION_SERVER:-https://push-test.mattermost.com}
+      MM_EMAILSETTINGS_PUSHNOTIFICATIONCONTENTS: full
+      MM_SUPPORTSETTINGS_TERMSOFSERVICELINK: https://www.forward.org.tw/a/tos
+      MM_SUPPORTSETTINGS_PRIVACYPOLICYLINK: https://www.forward.org.tw/a/privacy
+      MM_SUPPORTSETTINGS_ABOUTLINK: https://www.forward.org.tw/about/us
+      # Empty on purpose: the webapp renders the Help and "Report a Problem"
+      # menu items only when these carry a value, so blanking them removes the
+      # entries rather than hiding them after the fact. Support reaches us
+      # through the volunteer system, not through the chat client.
+      MM_SUPPORTSETTINGS_HELPLINK: ${MM_HELP_LINK:-}
+      MM_SUPPORTSETTINGS_REPORTAPROBLEMLINK: ${MM_REPORT_PROBLEM_LINK:-}
+      MM_SUPPORTSETTINGS_REPORTAPROBLEMTYPE: link
+      MM_SUPPORTSETTINGS_REPORTAPROBLEMMAIL: 'contact@forward.org.tw'
+      MM_SUPPORTSETTINGS_ALLOWDOWNLOADLOGS: 'true'
+      MM_SUPPORTSETTINGS_FORGOTPASSWORDLINK: ${MM_FORGOT_PASSWORD_LINK:-https://account.forward.org.tw/mattermost/password}
+      MM_SUPPORTSETTINGS_SUPPORTEMAIL: 'contact@forward.org.tw'
+      MM_SUPPORTSETTINGS_CUSTOMTERMSOFSERVICEENABLED: 'false'
+      MM_SUPPORTSETTINGS_CUSTOMTERMSOFSERVICEREACCEPTANCEPERIOD: '365'
+      MM_SUPPORTSETTINGS_ENABLEASKCOMMUNITYLINK: 'false'
+      MM_LOCALIZATIONSETTINGS_DEFAULTSERVERLOCALE: zh-TW
+      MM_LOCALIZATIONSETTINGS_DEFAULTCLIENTLOCALE: zh-TW
+      MM_LOCALIZATIONSETTINGS_AVAILABLELOCALES: en,zh-TW
+      MM_THEMESETTINGS_DEFAULTTHEME: denim
+      MM_PRIVACYSETTINGS_SHOWEMAILADDRESS: 'false'
+      MM_PRIVACYSETTINGS_SHOWFULLNAME: 'true'
+      # Also empty on purpose, and for the same reason: chat is reached through
+      # the iCanHelp app and the web client, so pointing users at a separate
+      # Mattermost download only leads them somewhere they cannot sign in.
+      MM_NATIVEAPPSETTINGS_APPDOWNLOADLINK: ${MM_APP_DOWNLOAD_LINK:-}
+      MM_NATIVEAPPSETTINGS_ANDROIDAPPDOWNLOADLINK: ${MM_APP_DOWNLOAD_LINK:-}
+      MM_NATIVEAPPSETTINGS_IOSAPPDOWNLOADLINK: ${MM_APP_DOWNLOAD_LINK:-}
+      MM_PLUGINSETTINGS_DIRECTORY: /mattermost/forward-plugins
+      MM_PLUGINSETTINGS_ENABLEUPLOADS: 'true'
+
+volumes:
+  mattermost-config:
+  mattermost-data:
+  mattermost-logs:
+  mattermost-bleve-indexes:

@@ -1,0 +1,53 @@
+services:
+  mattermost:
+    # Built and pushed by cloudbuild.mattermost.yaml; the VM only pulls. Pinned to an
+    # immutable build tag so redeploying an older tag is a complete rollback.
+    image: ${MATTERMOST_IMAGE:?set MATTERMOST_IMAGE in the environment .env (written by the deploy pipeline)}
+    depends_on:
+      cloud-sql-proxy:
+        condition: service_started
+    expose:
+      - '8065'
+    volumes:
+      - cloudsql-socket:/cloudsql:rw
+    environment:
+      MM_SQLSETTINGS_DATASOURCE: ${MM_DATASOURCE}
+      MM_SERVICESETTINGS_SITEURL: ${MM_SITE_URL}
+      MM_SERVICESETTINGS_ALLOWCORSFROM: ${MM_WEB_ORIGINS:?set MM_WEB_ORIGINS in the environment .env (space-separated origins allowed to embed/call Mattermost)}
+      MM_SERVICESETTINGS_CORSALLOWCREDENTIALS: 'true'
+      MM_SERVICESETTINGS_FRAMEANCESTORS: ${MM_WEB_ORIGINS:?set MM_WEB_ORIGINS in the environment .env (space-separated origins allowed to embed/call Mattermost)}
+      MM_EMAILSETTINGS_ENABLESMTPAUTH: 'true'
+      MM_EMAILSETTINGS_CONNECTIONSECURITY: 'STARTTLS'
+      MM_FILESETTINGS_DRIVERNAME: ${MM_FILESETTINGS_DRIVERNAME:-amazons3}
+      MM_FILESETTINGS_AMAZONS3ACCESSKEYID: ${MM_FILESETTINGS_AMAZONS3ACCESSKEYID}
+      MM_FILESETTINGS_AMAZONS3SECRETACCESSKEY: ${MM_FILESETTINGS_AMAZONS3SECRETACCESSKEY}
+      MM_FILESETTINGS_AMAZONS3BUCKET: ${MM_FILESETTINGS_AMAZONS3BUCKET}
+      MM_FILESETTINGS_AMAZONS3PATHPREFIX: ${MM_FILESETTINGS_AMAZONS3PATHPREFIX:-}
+      MM_FILESETTINGS_AMAZONS3REGION: ${MM_FILESETTINGS_AMAZONS3REGION:-}
+      MM_FILESETTINGS_AMAZONS3ENDPOINT: ${MM_FILESETTINGS_AMAZONS3ENDPOINT:-storage.googleapis.com}
+      MM_FILESETTINGS_AMAZONS3SSL: ${MM_FILESETTINGS_AMAZONS3SSL:-true}
+      MM_FILESETTINGS_AMAZONS3SIGNV2: ${MM_FILESETTINGS_AMAZONS3SIGNV2:-false}
+
+  cloud-sql-proxy:
+    image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.21.2
+    user: '0:0'
+    restart: unless-stopped
+    command:
+      - --private-ip
+      - --unix-socket=/cloudsql
+      - ${CLOUDSQL_INSTANCE_CONNECTION_NAME}
+    volumes:
+      - cloudsql-socket:/cloudsql:rw
+
+  cloudflared:
+    image: cloudflare/cloudflared:2026.3.0
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      mattermost:
+        condition: service_started
+
+volumes:
+  cloudsql-socket:

@@ -1,0 +1,108 @@
+Forward Alliance — Mattermost deployment
+========================================
+
+This directory builds and runs a MODIFIED version of the Mattermost server.
+Because that modified version is offered to users over a network, AGPL v3.0
+section 13 applies, and the Corresponding Source is published. See
+"Obtaining the Corresponding Source" below.
+
+Nothing here is affiliated with or endorsed by Mattermost, Inc.
+
+
+Upstream
+--------
+
+Mattermost, Inc. — https://github.com/mattermost/mattermost
+Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
+
+The exact upstream revision is pinned in Dockerfile as MATTERMOST_SOURCE_REF
+and MATTERMOST_VERSION, which must name the same release. At the time of
+writing both are v11.3.3.
+
+Upstream applies more than one license to its tree (see LICENSE.txt in the
+upstream repository):
+
+  - AGPL v3.0 for the server source, except as carved out below
+  - Apache License 2.0 for server/templates/, server/i18n/, server/public/
+    and webapp/, and all subdirectories thereof
+  - A separate commercial license, not used here
+
+Which license covers a modification therefore depends on which path it
+touches. The list below records that for each modification.
+
+
+Modifications
+-------------
+
+1. server/channels/app/limits.go — AGPL v3.0
+
+   scripts/patch-user-limits.sh rewrites the constants maxUsersLimit and
+   maxUsersHardLimit, which upstream v11.3.3 sets to 200 and 250, to the value
+   of the MM_MAX_USERS build argument. The server binary is then rebuilt from
+   the patched source and replaces the one shipped in the base image.
+
+   This path is not in the Apache-2.0 carve-out, so this modification is the
+   one that makes the running server a modified AGPL work and triggers the
+   section 13 obligation.
+
+   The rebuilt binary is compiled without the `enterprise` and `sourceavailable`
+   build tags and with BuildEnterpriseReady=false, so no source-available
+   enterprise code from server/enterprise/ is compiled into it.
+
+2. server/i18n/*.json — Apache License 2.0
+
+   scripts/patch-i18n-email-subjects.sh prefixes every translation whose id
+   matches api.templates.*subject, and api.admin.test_email.subject, with
+   "mattermost::reject ". Outbound SMTP is configured with a subject rule that
+   drops messages carrying that prefix.
+
+3. webapp client assets — Apache License 2.0
+
+   scripts/patch-root-html.sh injects a stylesheet link into client/root.html,
+   and static/overrides.css overrides theme variables and hides announcement
+   bars.
+
+Modifications 2 and 3 fall under the Apache-2.0 carve-out rather than the
+AGPL. They are listed here because Apache-2.0 section 4(b) asks that modified
+files carry prominent notice of the change, and because they are part of the
+Corresponding Source for the running service either way.
+
+
+Original work
+-------------
+
+Everything else in this directory — the Dockerfile, the scripts under
+scripts/, the compose files, static/overrides.css, the plugins under plugins/,
+and cmd/plugin-bootstrap — is original work of the Forward Alliance and is
+released under AGPL v3.0. See LICENSE.
+
+The plugins communicate with the Mattermost server over its RPC plugin API as
+separate processes. They are licensed under AGPL v3.0 here regardless of
+whether that boundary would make them independent works.
+
+
+Obtaining the Corresponding Source
+----------------------------------
+
+The Corresponding Source for the running server is the upstream tree at the
+pinned MATTERMOST_SOURCE_REF, plus the patch scripts and Dockerfile in this
+directory. Applying them to that revision reproduces the deployed binary.
+
+  https://github.com/ForwardAlliance/fa-mattermost
+
+Deployment configuration containing credentials is not part of the published
+source. .env.prod.example lists every variable the deployment reads, with
+placeholder values.
+
+
+Trademarks
+----------
+
+"Mattermost" is a trademark of Mattermost, Inc. Upstream's LICENSE.txt states
+that use of the mark is subject to Mattermost, Inc.'s prior written approval
+and to its Trademark Standards of Use at
+https://mattermost.com/trademark-standards-of-use/.
+
+The trademark is separate from the copyright license: AGPL v3.0 grants rights
+in the source code and grants no rights in the mark. This notice records that
+distinction; it is not a claim that any particular use here has been approved.

@@ -1,0 +1,136 @@
+html {
+  --away-indicator-rgb: 255, 188, 31 !important;
+  --button-bg-rgb: 158, 21, 78 !important;
+  --button-color-rgb: 255, 255, 255 !important;
+  --center-channel-bg-rgb: 250, 250, 250 !important;
+  --center-channel-color-rgb: 51, 51, 51 !important;
+  --dnd-indicator-rgb: 210, 75, 78 !important;
+  --error-text-color-rgb: 210, 75, 78 !important;
+  --link-color-rgb: 158, 21, 78 !important;
+  --mention-bg-rgb: 158, 21, 78 !important;
+  --mention-color-rgb: 255, 255, 255 !important;
+  --mention-highlight-bg-rgb: 233, 84, 146 !important;
+  --mention-highlight-link-rgb: 158, 21, 78 !important;
+  --mention-highlight-bg-mixed-rgb: 242, 167, 198 !important;
+  --pinned-highlight-bg-mixed-rgb: 246, 209, 224 !important;
+  --own-highlight-bg-rgb: 228, 181, 200 !important;
+  --new-message-separator-rgb: 158, 21, 78 !important;
+  --online-indicator-rgb: 61, 184, 135 !important;
+  --sidebar-bg-rgb: 35, 62, 88 !important;
+  --sidebar-header-bg-rgb: 22, 39, 55 !important;
+  --sidebar-teambar-bg-rgb: 14, 26, 37 !important;
+  --sidebar-header-text-color-rgb: 255, 255, 255 !important;
+  --sidebar-text-rgb: 255, 255, 255 !important;
+  --sidebar-text-active-border-rgb: 44, 77, 110 !important;
+  --sidebar-text-active-color-rgb: 255, 255, 255 !important;
+  --sidebar-text-hover-bg-rgb: 44, 77, 110 !important;
+  --sidebar-unread-text-rgb: 255, 255, 255 !important;
+  --sidebar-header-bg: #162737 !important;
+  --sidebar-bg: #233e58 !important;
+  --sidebar-text: #ffffff !important;
+  --sidebar-unread-text: #ffffff !important;
+  --sidebar-text-hover-bg: #2c4d6e !important;
+  --sidebar-text-active-border: #2c4d6e !important;
+  --sidebar-text-active-color: #ffffff !important;
+  --sidebar-teambar-bg: #233e58 !important;
+  --sidebar-header-text-color: #ffffff !important;
+  --online-indicator: #3db887 !important;
+  --away-indicator: #ffbc1f !important;
+  --dnd-indicator: #d24b4e !important;
+  --mention-bg: #9e154e !important;
+  --mention-color: #ffffff !important;
+  --center-channel-bg: #fafafa !important;
+  --center-channel-color: #333333 !important;
+  --new-message-separator: #9e154e !important;
+  --link-color: #9e154e !important;
+  --button-bg: #9e154e !important;
+  --button-color: #ffffff !important;
+  --error-text: #d24b4e !important;
+  --mention-highlight-bg: #e95492 !important;
+  --mention-highlight-link: #9e154e !important;
+  --sidebar-text-08: rgba(255, 255, 255, 0.08) !important;
+  --sidebar-text-16: rgba(255, 255, 255, 0.16) !important;
+  --sidebar-text-30: rgba(255, 255, 255, 0.3) !important;
+  --sidebar-text-40: rgba(255, 255, 255, 0.4) !important;
+  --sidebar-text-50: rgba(255, 255, 255, 0.5) !important;
+  --sidebar-text-60: rgba(255, 255, 255, 0.6) !important;
+  --sidebar-text-72: rgba(255, 255, 255, 0.72) !important;
+  --sidebar-text-80: rgba(255, 255, 255, 0.8) !important;
+  --sidebar-header-text-color-80: rgba(255, 255, 255, 0.8) !important;
+  --center-channel-bg-88: rgba(250, 250, 250, 0.88) !important;
+  --center-channel-color-88: rgba(51, 51, 51, 0.88) !important;
+  --center-channel-bg-80: rgba(250, 250, 250, 0.8) !important;
+  --center-channel-color-80: rgba(51, 51, 51, 0.8) !important;
+  --center-channel-color-72: rgba(51, 51, 51, 0.72) !important;
+  --center-channel-bg-64: rgba(250, 250, 250, 0.64) !important;
+  --center-channel-color-64: rgba(51, 51, 51, 0.64) !important;
+  --center-channel-bg-56: rgba(250, 250, 250, 0.56) !important;
+  --center-channel-color-56: rgba(51, 51, 51, 0.56) !important;
+  --center-channel-color-48: rgba(51, 51, 51, 0.48) !important;
+  --center-channel-bg-40: rgba(250, 250, 250, 0.4) !important;
+  --center-channel-color-40: rgba(51, 51, 51, 0.4) !important;
+  --center-channel-bg-30: rgba(250, 250, 250, 0.3) !important;
+  --center-channel-color-32: rgba(51, 51, 51, 0.32) !important;
+  --center-channel-bg-20: rgba(250, 250, 250, 0.2) !important;
+  --center-channel-color-20: rgba(51, 51, 51, 0.2) !important;
+  --center-channel-bg-16: rgba(250, 250, 250, 0.16) !important;
+  --center-channel-color-24: rgba(51, 51, 51, 0.24) !important;
+  --center-channel-color-16: rgba(51, 51, 51, 0.16) !important;
+  --center-channel-bg-08: rgba(250, 250, 250, 0.08) !important;
+  --center-channel-color-08: rgba(51, 51, 51, 0.08) !important;
+  --center-channel-color-04: rgba(51, 51, 51, 0.04) !important;
+  --link-color-08: rgba(158, 21, 78, 0.08) !important;
+  --button-bg-88: rgba(158, 21, 78, 0.88) !important;
+  --button-color-88: rgba(255, 255, 255, 0.88) !important;
+  --button-bg-80: rgba(158, 21, 78, 0.8) !important;
+  --button-color-80: rgba(255, 255, 255, 0.8) !important;
+  --button-bg-72: rgba(158, 21, 78, 0.72) !important;
+  --button-color-72: rgba(255, 255, 255, 0.72) !important;
+  --button-bg-64: rgba(158, 21, 78, 0.64) !important;
+  --button-color-64: rgba(255, 255, 255, 0.64) !important;
+  --button-bg-56: rgba(158, 21, 78, 0.56) !important;
+  --button-color-56: rgba(255, 255, 255, 0.56) !important;
+  --button-bg-48: rgba(158, 21, 78, 0.48) !important;
+  --button-color-48: rgba(255, 255, 255, 0.48) !important;
+  --button-bg-40: rgba(158, 21, 78, 0.4) !important;
+  --button-color-40: rgba(255, 255, 255, 0.4) !important;
+  --button-bg-30: rgba(158, 21, 78, 0.32) !important;
+  --button-color-32: rgba(255, 255, 255, 0.32) !important;
+  --button-bg-24: rgba(158, 21, 78, 0.24) !important;
+  --button-color-24: rgba(255, 255, 255, 0.24) !important;
+  --button-bg-16: rgba(158, 21, 78, 0.16) !important;
+  --button-color-16: rgba(255, 255, 255, 0.16) !important;
+  --button-bg-08: rgba(158, 21, 78, 0.08) !important;
+  --button-color-08: rgba(255, 255, 255, 0.08) !important;
+  --button-bg-04: rgba(158, 21, 78, 0.04) !important;
+  --button-color-04: rgba(255, 255, 255, 0.04) !important;
+  --error-text-08: rgba(210, 75, 78, 0.08) !important;
+  --error-text-12: rgba(210, 75, 78, 0.12) !important;
+  --announcement-bar-count: 2 !important;
+}
+
+.announcement-bar,
+.post-history-limit-banner {
+  display: none !important;
+}
+
+/*
+ * Signing out strands the user: the account service generates each Mattermost
+ * password, encrypts it and logs the user in transparently, so nobody knows
+ * their own credentials and the sign-in form is unusable. Recovery means going
+ * back through the account service.
+ */
+#logout {
+  display: none !important;
+}
+
+.app__body.announcement-bar--fixed {
+  padding-top: 0 !important;
+}
+
+.about-modal__logo,
+.about-modal__content .form-group.less,
+.about-modal__notice,
+.about-modal__hash {
+  display: none !important;
+}

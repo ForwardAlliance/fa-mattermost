@@ -1,0 +1,43 @@
+services:
+  mattermost:
+    platform: linux/amd64
+    image: forward-mattermost:${MATTERMOST_VERSION:-11.3.3}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MATTERMOST_VERSION: ${MATTERMOST_VERSION:-11.3.3}
+        MATTERMOST_SOURCE_REF: ${MATTERMOST_SOURCE_REF:-v11.3.3}
+        MM_MAX_USERS: ${MM_MAX_USERS:-100000}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - '8065:8065'
+    environment:
+      MM_SQLSETTINGS_DATASOURCE: postgres://postgres:password@postgres:5432/mattermost?sslmode=disable&connect_timeout=10
+      MM_SERVICESETTINGS_SITEURL: http://localhost:8065
+      MM_SERVICESETTINGS_ALLOWCORSFROM: http://localhost:3002
+      MM_SERVICESETTINGS_CORSALLOWCREDENTIALS: 'true'
+      MM_SERVICESETTINGS_FRAMEANCESTORS: http://localhost:3002
+      MM_TEAMSETTINGS_ENABLEUSERCREATION: 'true'
+      MM_EMAILSETTINGS_ENABLESIGNUPWITHEMAIL: 'true'
+
+  postgres:
+    image: imresamu/postgis:16-3.5-alpine # Using a community built PostGIS image for arm64 support
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mattermost
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres-data:
