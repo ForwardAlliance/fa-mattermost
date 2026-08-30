@@ -22,7 +22,12 @@ services:
       MM_SERVICESETTINGS_ENABLEEMAILINVITATIONS: 'false'
       MM_SERVICESETTINGS_ENABLEMULTIFACTORAUTHENTICATION: 'true'
       MM_SERVICESETTINGS_ENABLEDESKTOPLANDINGPAGE: 'false'
-      MM_SERVICESETTINGS_EXPERIMENTALPRIMARYTEAM: ${MM_PRIMARY_TEAM:-forward-alliance}
+      # TeamSettings, not ServiceSettings: the setting lives at
+      # TeamSettings.ExperimentalPrimaryTeam, and Mattermost drops an env var
+      # whose section prefix does not match a real config key without a word of
+      # complaint. Under the old MM_SERVICESETTINGS_ name it was silently
+      # ignored, so the value stayed empty and Leave Team kept rendering.
+      MM_TEAMSETTINGS_EXPERIMENTALPRIMARYTEAM: ${MM_PRIMARY_TEAM:-forward}
       MM_TEAMSETTINGS_SITENAME: 壯闊台灣通訊系統
       MM_TEAMSETTINGS_MAXUSERSPERTEAM: '10000'
       MM_TEAMSETTINGS_TEAMMATENAMEDISPLAY: nickname_full_name
