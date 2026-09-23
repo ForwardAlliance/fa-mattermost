@@ -124,6 +124,17 @@ html {
   display: none !important;
 }
 
+/*
+ * Mattermost has no server-side setting to remove the formatting toolbar —
+ * only a personal, per-user "Aa" toggle button. Hiding it here keeps the
+ * composer simple by default for all volunteers. The toggle button is hidden
+ * too so it isn't a dead control once the bar it operates on is gone.
+ */
+[data-testid='formattingBarContainer'],
+#toggleFormattingBarButton {
+  display: none !important;
+}
+
 .app__body.announcement-bar--fixed {
   padding-top: 0 !important;
 }
@@ -133,4 +144,14 @@ html {
 .about-modal__notice,
 .about-modal__hash {
   display: none !important;
+}
+
+/* Removes the tap-delay/double-tap-zoom detection window on touch devices. */
+button,
+[role='button'],
+a,
+input,
+textarea,
+.btn {
+  touch-action: manipulation;
 }
