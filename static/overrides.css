@@ -115,6 +115,14 @@ html {
 }
 
 /*
+ * The initial boot splash (compass animation) reappears on every load of the
+ * embedded client, including each visit to the Teams tab, so it's hidden here.
+ */
+#initialPageLoadingScreen {
+  display: none !important;
+}
+
+/*
  * Signing out strands the user: the account service generates each Mattermost
  * password, encrypts it and logs the user in transparently, so nobody knows
  * their own credentials and the sign-in form is unusable. Recovery means going
