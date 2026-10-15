@@ -101,7 +101,11 @@ COPY scripts/patch-root-html.sh ./scripts/patch-root-html.sh
 COPY static/overrides.css ./client/overrides.css
 COPY static/overrides.js ./client/overrides.js
 
-RUN sh ./scripts/patch-root-html.sh ./client/root.html /static/overrides.css /static/overrides.js
+RUN css_hash=$(sha256sum ./client/overrides.css | cut -c1-12) \
+  && js_hash=$(sha256sum ./client/overrides.js | cut -c1-12) \
+  && sh ./scripts/patch-root-html.sh ./client/root.html \
+    "/static/overrides.css?v=${css_hash}" \
+    "/static/overrides.js?v=${js_hash}"
 
 FROM mattermost/mattermost-team-edition:${MATTERMOST_VERSION}
 COPY --chown=2000:2000 --from=server-builder /mattermost-server /mattermost/bin/mattermost
