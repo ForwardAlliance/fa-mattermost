@@ -18,7 +18,16 @@ const (
 	mattermostBinary = "/mattermost/bin/mattermost"
 	mmctlBinary      = "/mattermost/bin/mmctl"
 	bundlesDirectory = "/mattermost/forward-plugin-bundles"
+	memberRole       = "team_user"
 )
+
+// Channels are created only by admins and by the volunteers app through the
+// admin token. Mattermost has no config setting for this; it is governed by
+// these team_user permissions, which the default scheme grants.
+var revokedMemberPermissions = []string{
+	"create_public_channel",
+	"create_private_channel",
+}
 
 type pluginListEntry struct {
 	Active   []pluginInfo `json:"active"`
@@ -45,7 +54,7 @@ func main() {
 
 	forwardSignals(serverCmd)
 
-	go bootstrapPlugins()
+	go bootstrap()
 
 	if err := serverCmd.Wait(); err != nil {
 		var exitErr *exec.ExitError
@@ -74,7 +83,34 @@ func forwardSignals(serverCmd *exec.Cmd) {
 	}()
 }
 
-func bootstrapPlugins() {
+func bootstrap() {
+	statuses, err := waitForPluginList()
+	if err != nil {
+		log.Printf("bootstrap could not reach Mattermost local API: %v", err)
+		return
+	}
+
+	bootstrapPlugins(statuses)
+	enforceMemberPermissions()
+}
+
+// Role permissions live in the database rather than in config, so a change made
+// in the System Console is invisible to the repo and can drift between
+// environments. Reapplying on every boot keeps the policy version controlled;
+// a console edit to these permissions is deliberately reverted on restart.
+func enforceMemberPermissions() {
+	args := append([]string{"permissions", "remove", memberRole}, revokedMemberPermissions...)
+	args = append(args, "--local")
+
+	if err := runMMCTL(args...); err != nil {
+		log.Printf("ERROR bootstrap failed to revoke %v from %s; members can still create channels: %v", revokedMemberPermissions, memberRole, err)
+		return
+	}
+
+	log.Printf("bootstrap revoked %v from %s", revokedMemberPermissions, memberRole)
+}
+
+func bootstrapPlugins(statuses map[string]pluginStatus) {
 	bundles, err := filepath.Glob(filepath.Join(bundlesDirectory, "*.tar.gz"))
 	if err != nil {
 		log.Printf("plugin bootstrap failed to enumerate bundles: %v", err)
@@ -83,12 +119,6 @@ func bootstrapPlugins() {
 
 	if len(bundles) == 0 {
 		log.Printf("plugin bootstrap found no bundles in %s", bundlesDirectory)
-		return
-	}
-
-	statuses, err := waitForPluginList()
-	if err != nil {
-		log.Printf("plugin bootstrap could not reach Mattermost plugin API: %v", err)
 		return
 	}
 
