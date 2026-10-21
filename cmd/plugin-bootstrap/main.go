@@ -18,15 +18,82 @@ const (
 	mattermostBinary = "/mattermost/bin/mattermost"
 	mmctlBinary      = "/mattermost/bin/mmctl"
 	bundlesDirectory = "/mattermost/forward-plugin-bundles"
-	memberRole       = "team_user"
 )
 
-// Channels are created only by admins and by the volunteers app through the
-// admin token. Mattermost has no config setting for this; it is governed by
-// these team_user permissions, which the default scheme grants.
-var revokedMemberPermissions = []string{
-	"create_public_channel",
-	"create_private_channel",
+type rolePermissions struct {
+	role        string
+	permissions []string
+}
+
+// Only system admins and the apps acting through the admin token create teams,
+// create or archive channels, and manage roles. Mattermost has no config setting
+// for any of this; it is governed by these role permissions, which the default
+// scheme grants. team_admin and channel_admin are built in and cannot be
+// removed, so they are emptied instead: holding either grants nothing a regular
+// member does not already have.
+var revokedPermissions = []rolePermissions{
+	{
+		role:        "system_user",
+		permissions: []string{"create_team"},
+	},
+	{
+		role:        "team_user",
+		permissions: []string{"create_public_channel", "create_private_channel"},
+	},
+	{
+		role: "team_admin",
+		permissions: []string{
+			"manage_team",
+			"manage_team_roles",
+			"manage_channel_roles",
+			"remove_user_from_team",
+			"import_team",
+			"manage_own_incoming_webhooks",
+			"manage_others_incoming_webhooks",
+			"manage_own_outgoing_webhooks",
+			"manage_others_outgoing_webhooks",
+			"manage_own_slash_commands",
+			"manage_others_slash_commands",
+			"bypass_incoming_webhook_channel_lock",
+			"convert_public_channel_to_private",
+			"convert_private_channel_to_public",
+			"delete_post",
+			"delete_others_posts",
+			"add_bookmark_public_channel",
+			"edit_bookmark_public_channel",
+			"delete_bookmark_public_channel",
+			"order_bookmark_public_channel",
+			"add_bookmark_private_channel",
+			"edit_bookmark_private_channel",
+			"delete_bookmark_private_channel",
+			"order_bookmark_private_channel",
+			"manage_public_channel_banner",
+			"manage_private_channel_banner",
+			"manage_channel_access_rules",
+		},
+	},
+	{
+		role:        "channel_user",
+		permissions: []string{"delete_public_channel", "delete_private_channel"},
+	},
+	{
+		role: "channel_admin",
+		permissions: []string{
+			"manage_channel_roles",
+			"use_group_mentions",
+			"add_bookmark_public_channel",
+			"edit_bookmark_public_channel",
+			"delete_bookmark_public_channel",
+			"order_bookmark_public_channel",
+			"add_bookmark_private_channel",
+			"edit_bookmark_private_channel",
+			"delete_bookmark_private_channel",
+			"order_bookmark_private_channel",
+			"manage_public_channel_banner",
+			"manage_private_channel_banner",
+			"manage_channel_access_rules",
+		},
+	},
 }
 
 type pluginListEntry struct {
@@ -91,23 +158,25 @@ func bootstrap() {
 	}
 
 	bootstrapPlugins(statuses)
-	enforceMemberPermissions()
+	enforceRolePermissions()
 }
 
 // Role permissions live in the database rather than in config, so a change made
 // in the System Console is invisible to the repo and can drift between
 // environments. Reapplying on every boot keeps the policy version controlled;
 // a console edit to these permissions is deliberately reverted on restart.
-func enforceMemberPermissions() {
-	args := append([]string{"permissions", "remove", memberRole}, revokedMemberPermissions...)
-	args = append(args, "--local")
+func enforceRolePermissions() {
+	for _, entry := range revokedPermissions {
+		args := append([]string{"permissions", "remove", entry.role}, entry.permissions...)
+		args = append(args, "--local")
 
-	if err := runMMCTL(args...); err != nil {
-		log.Printf("ERROR bootstrap failed to revoke %v from %s; members can still create channels: %v", revokedMemberPermissions, memberRole, err)
-		return
+		if err := runMMCTL(args...); err != nil {
+			log.Printf("ERROR bootstrap failed to revoke %v from %s; %s still holds them: %v", entry.permissions, entry.role, entry.role, err)
+			continue
+		}
+
+		log.Printf("bootstrap revoked %v from %s", entry.permissions, entry.role)
 	}
-
-	log.Printf("bootstrap revoked %v from %s", revokedMemberPermissions, memberRole)
 }
 
 func bootstrapPlugins(statuses map[string]pluginStatus) {

@@ -124,3 +124,95 @@
     true,
   )
 })()
+
+// Volunteers never hold a Mattermost password: the account service signs them
+// in, so the login form is a dead end for them. Whenever Mattermost shows it
+// (a direct visit, an expired session, or a logout, which reaches /login by
+// client-side navigation), this sends them through the account service's
+// /mattermost/go instead. That URL differs per environment and is already the
+// "Forgot password" link, so it is read from the public client config rather
+// than written here. System admins reach the form with /login?admin=1.
+;(function () {
+  var ACCOUNT_SIGN_IN_SUFFIX = '/mattermost/go'
+  var LAST_REDIRECT_KEY = 'fa:loginRedirectAt'
+  // A sign-in that Mattermost still rejects would otherwise bounce forever.
+  var REDIRECT_COOLDOWN = 10000
+
+  var redirecting = false
+
+  function readLastRedirect() {
+    try {
+      return Number(window.sessionStorage.getItem(LAST_REDIRECT_KEY)) || 0
+    } catch (error) {
+      return 0
+    }
+  }
+
+  function writeLastRedirect(time) {
+    try {
+      window.sessionStorage.setItem(LAST_REDIRECT_KEY, String(time))
+    } catch (error) {}
+  }
+
+  // Resolved rather than pattern-matched: the URL parser turns `//host`,
+  // `/\host` and paths with embedded tabs or newlines into other origins.
+  function safeRedirectPath(params) {
+    var origin = window.location.origin
+    try {
+      var target = new URL(params.get('redirect_to') || '/', origin)
+      return target.origin === origin
+        ? target.pathname + target.search + target.hash
+        : '/'
+    } catch (error) {
+      return '/'
+    }
+  }
+
+  function isVolunteerLoginPage(params) {
+    return (
+      window.location.pathname.indexOf('/login') === 0 &&
+      params.get('admin') !== '1'
+    )
+  }
+
+  function redirectFromLogin() {
+    var params = new URLSearchParams(window.location.search)
+    var now = Date.now()
+
+    if (redirecting || !isVolunteerLoginPage(params)) return
+    if (now - readLastRedirect() < REDIRECT_COOLDOWN) return
+
+    redirecting = true
+
+    fetch('/api/v4/config/client?format=old', { credentials: 'same-origin' })
+      .then(function (response) {
+        return response.ok ? response.json() : {}
+      })
+      .then(function (config) {
+        var link = config.ForgotPasswordLink
+        if (!link) return
+
+        var target = new URL(link)
+        if (
+          target.pathname.slice(-ACCOUNT_SIGN_IN_SUFFIX.length) !==
+          ACCOUNT_SIGN_IN_SUFFIX
+        ) {
+          return
+        }
+
+        target.searchParams.set('p', safeRedirectPath(params))
+        writeLastRedirect(now)
+        window.location.replace(target.toString())
+      })
+      .catch(function () {})
+      .then(function () {
+        redirecting = false
+      })
+  }
+
+  redirectFromLogin()
+  new MutationObserver(redirectFromLogin).observe(document.body, {
+    childList: true,
+    subtree: true,
+  })
+})()

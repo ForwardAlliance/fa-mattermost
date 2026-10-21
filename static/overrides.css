@@ -127,8 +127,28 @@ html {
  * password, encrypts it and logs the user in transparently, so nobody knows
  * their own credentials and the sign-in form is unusable. Recovery means going
  * back through the account service.
+ *
+ * `#logout` is the mobile main menu entry. The account menu's "Log out" has no
+ * id, so it is matched by position: it is the last item of `#userAccountMenu`,
+ * after a divider, both in the desktop popover (where the list itself carries
+ * the id) and in the mobile modal (where a list nested inside it does). Check
+ * the position again on a Mattermost upgrade. `/logout` cannot be hidden; the
+ * login redirect in overrides.js signs the user straight back in.
  */
-#logout {
+#logout,
+#userAccountMenu > [role='menuitem']:last-child,
+#userAccountMenu > .MuiDivider-root:nth-last-child(2),
+#userAccountMenu .MuiList-root > [role='menuitem']:last-child,
+#userAccountMenu .MuiList-root > .MuiDivider-root:nth-last-child(2) {
+  display: none !important;
+}
+
+/*
+ * Changing the password needs the current one, which nobody but the account
+ * service knows, so the Profile > Security row is a dead control. Admins who
+ * hold a real password reset it from the System Console or mmctl instead.
+ */
+.section-min:has(#passwordEdit) {
   display: none !important;
 }
 
